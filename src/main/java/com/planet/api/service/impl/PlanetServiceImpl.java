@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.planet.api.document.Planet;
-import com.planet.api.exceptions.PayloadNotConsistentException;
-import com.planet.api.exceptions.ResourceAlreadyExistsException;
-import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.repository.PlanetRepository;
 import com.planet.api.service.PlanetService;
 
@@ -20,23 +17,19 @@ public class PlanetServiceImpl implements PlanetService {
 	private PlanetRepository planetRepository;
 
 	@Override
-	public Planet add(Planet planet) throws PayloadNotConsistentException {
-		if (planet.getId() == null) {
-			return this.planetRepository.save(planet);
-		}
-		throw new PayloadNotConsistentException();
-	}
-
-	@Override
-	public Planet update(Planet planet) throws ResourcesNotFoundException {
-		this.findById(planet.getId());
+	public Planet add(Planet planet) {
 		return this.planetRepository.save(planet);
 	}
 
 	@Override
-	public Optional<Planet> findById(String id) throws ResourcesNotFoundException {
-		return this.planetRepository.findById(id).map(record -> Optional.of(record))
-				.orElseThrow(ResourcesNotFoundException::new);
+	public Optional<Planet> update(Planet planet) {
+		return this.findById(planet.getId()).map(record -> Optional.of(this.planetRepository.save(planet)))
+				.orElse(Optional.empty());
+	}
+
+	@Override
+	public Optional<Planet> findById(String id) {
+		return this.planetRepository.findById(id).map(record -> Optional.of(record)).orElse(Optional.empty());
 	}
 
 	@Override
@@ -45,8 +38,8 @@ public class PlanetServiceImpl implements PlanetService {
 	}
 
 	@Override
-	public void delete(String id) throws ResourcesNotFoundException {
-		this.findById(id).ifPresent(record -> this.planetRepository.deleteById(record.getId()));
+	public void delete(String id) {
+		this.planetRepository.deleteById(id);
 
 	}
 

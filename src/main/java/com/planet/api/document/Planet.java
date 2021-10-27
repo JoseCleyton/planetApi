@@ -37,6 +37,14 @@ public class Planet {
 		this.climate = climate;
 		this.numberOfApparitions = numberOfApparitions;
 	}
+	
+	public Planet(String name, String ground, String climate, int numberOfApparitions) {
+		super();
+		this.name = name;
+		this.ground = ground;
+		this.climate = climate;
+		this.numberOfApparitions = numberOfApparitions;
+	}
 
 	public String getId() {
 		return id;

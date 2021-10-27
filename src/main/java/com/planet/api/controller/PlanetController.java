@@ -1,7 +1,7 @@
 package com.planet.api.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planet.api.document.Planet;
-import com.planet.api.exceptions.PayloadNotConsistentException;
-import com.planet.api.exceptions.ResourceAlreadyExistsException;
 import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.response.Response;
 import com.planet.api.service.PlanetService;
@@ -45,16 +42,14 @@ public class PlanetController {
 
 	@GetMapping(path = "/{id}")
 	@ApiOperation(value = "List one Planet By Id")
-	public ResponseEntity<Planet> findById(@PathVariable String id) throws ResourcesNotFoundException {
+	public ResponseEntity<Planet> findById(@PathVariable String id) {
 		return this.planetService.findById(id).map(planet -> new ResponseEntity<>(planet, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@PostMapping
 	@ApiOperation(value = "Add one Planet")
-	public ResponseEntity<Response<Planet>> add(@Valid @RequestBody Planet planet, BindingResult bindingResult)
-			throws PayloadNotConsistentException {
-
+	public ResponseEntity<Response<Planet>> add(@Valid @RequestBody Planet planet, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			List<String> errs = this.buildListErrs(bindingResult);
 			return new ResponseEntity<Response<Planet>>(new Response<Planet>(errs), HttpStatus.BAD_REQUEST);
@@ -73,9 +68,9 @@ public class PlanetController {
 			return new ResponseEntity<Response<Planet>>(new Response<Planet>(errs), HttpStatus.BAD_REQUEST);
 		}
 
-		return this.planetService.findById(planet.getId())
+		return this.planetService.update(planet)
 				.map(record -> new ResponseEntity<Response<Planet>>(
-						new Response<Planet>(this.planetService.update(planet)), HttpStatus.ACCEPTED))
+						new Response<Planet>(this.planetService.update(planet).get()), HttpStatus.ACCEPTED))
 				.orElse(ResponseEntity.notFound().build());
 	}
 
@@ -86,11 +81,12 @@ public class PlanetController {
 	@DeleteMapping(path = "/{id}")
 	@ApiOperation(value = "Delete one Planet By Id")
 	public ResponseEntity<?> delete(@PathVariable String id) throws ResourcesNotFoundException {
+		Optional<Planet> planet = this.planetService.findById(id);
+		if (!planet.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
 		this.planetService.delete(id);
 		return ResponseEntity.ok().build();
-//		return this.planetService.findById(id)
-//				.map(planet -> new ResponseEntity<Planet>(this.planetService.delete(id), HttpStatus.OK))
-//				.orElse(ResponseEntity.notFound().build());
 
 	}
 

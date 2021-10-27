@@ -1,44 +1,34 @@
 package com.planet.api.controller.advice;
 
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.planet.api.exceptions.ArgumentNotValidException;
 import com.planet.api.exceptions.PayloadNotConsistentException;
-import com.planet.api.exceptions.ResourceAlreadyExistsException;
-import com.planet.api.exceptions.ResourcesNotFoundException;
+import com.planet.api.exceptions.response.ExceptionResponse;
 
 @ControllerAdvice
-public class PlanetControllerAdvice {
+@RestController
+public class PlanetControllerAdvice extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ResponseBody
-	public String handleException(Exception ex) {
-		return "Internal Server Error: " + ex.getMessage();
+	public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+				request.getDescription(false));
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@ExceptionHandler(ResourcesNotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public String handleResourcesNotFoundException(ResourcesNotFoundException ex) {
-		return "Resource not found";
-	}
-
-	@ExceptionHandler(ResourceAlreadyExistsException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ResponseBody
-	public String handleResourceExistsException(ResourceAlreadyExistsException ex) {
-		return "Resource Already Exists";
-	}
-	
 	@ExceptionHandler(PayloadNotConsistentException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ResponseBody
-	public String handlePayloadNotConsistentException(PayloadNotConsistentException ex) {
-		return "Payload not Consistent";
+	public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+				request.getDescription(false));
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
+
 }
