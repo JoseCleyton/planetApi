@@ -62,6 +62,14 @@ public class PlanetControllerTest {
 	}
 
 	@Test
+	public void shouldReturnSuccess_WhenFindByNamePlanet() {
+		Planet p1 = new Planet("1", "Dagobah", "Arenoso", "Árido", 10);
+		when(this.planetService.findByName("Dagobah")).thenReturn(Optional.of(p1));
+
+		given().accept(ContentType.JSON).when().get("/api/planet/?{name}", "Dagobah").then().status(HttpStatus.OK);
+	}
+
+	@Test
 	public void shouldReturnNotFound_WhenFindByIdPlanet() {
 		when(this.planetService.findById("2")).thenReturn(Optional.empty());
 

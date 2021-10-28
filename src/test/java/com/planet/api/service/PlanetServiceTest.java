@@ -2,6 +2,7 @@ package com.planet.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -89,11 +90,38 @@ public class PlanetServiceTest {
 	@DisplayName("Should Find Planet By Id")
 	public void shouldFindPlanetById() {
 		Planet planetMock = Mockito.mock(Planet.class);
-		Mockito.when(planetMock.getId()).thenReturn("1");
 		Mockito.when(this.planetRepository.findById("1")).thenReturn(Optional.of(planetMock));
 		Optional<Planet> planet = this.planetServiceImpl.findById("1");
 		assertTrue(planet.isPresent());
 		verify(this.planetRepository, Mockito.times(1)).findById("1");
+	}
+
+	@Test
+	@DisplayName("Not Should Find Planet By Id")
+	public void notShouldFindPlanetById() {
+		Mockito.when(this.planetRepository.findById("1")).thenReturn(Optional.empty());
+		Optional<Planet> planet = this.planetServiceImpl.findById("1");
+		assertFalse(planet.isPresent());
+		verify(this.planetRepository, Mockito.times(1)).findById("1");
+	}
+
+	@Test
+	@DisplayName("Should Find Planet By Name")
+	public void shouldFindPlanetByName() {
+		Planet planetMock = Mockito.mock(Planet.class);
+		Mockito.when(this.planetRepository.findByName("Dagobah")).thenReturn(Optional.of(planetMock));
+		Optional<Planet> planet = this.planetServiceImpl.findByName("Dagobah");
+		assertTrue(planet.isPresent());
+		verify(this.planetRepository, Mockito.times(1)).findByName("Dagobah");
+	}
+
+	@Test
+	@DisplayName("Not Should Find Planet By Name")
+	public void notShouldFindPlanetByName() {
+		Mockito.when(this.planetRepository.findByName("Dagobah")).thenReturn(Optional.empty());
+		Optional<Planet> planet = this.planetServiceImpl.findByName("Dagobah");
+		assertFalse(planet.isPresent());
+		verify(this.planetRepository, Mockito.times(1)).findByName("Dagobah");
 	}
 
 }
