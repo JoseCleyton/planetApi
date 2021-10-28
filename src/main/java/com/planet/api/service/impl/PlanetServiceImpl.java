@@ -46,6 +46,11 @@ public class PlanetServiceImpl implements PlanetService {
 	}
 
 	@Override
+	public Optional<Planet> findByName(String name) {
+		return this.planetRepository.findByName(name).map(record -> Optional.of(record)).orElse(Optional.empty());
+	}
+	
+	@Override
 	public List<Planet> findAll() {
 		return this.planetRepository.findAll();
 	}

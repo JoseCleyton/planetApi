@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planet.api.document.Planet;
@@ -47,6 +48,14 @@ public class PlanetController {
 		return this.planetService.findById(id).map(planet -> new ResponseEntity<>(planet, HttpStatus.OK))
 				.orElse(ResponseEntity.notFound().build());
 	}
+	
+	@GetMapping(params = "name")
+	@ApiOperation(value = "List one Planet By Name")
+	public ResponseEntity<Planet> findByName(@RequestParam(name = "name", defaultValue = "", required = true) String name) {
+		return this.planetService.findByName(name).map(planet -> new ResponseEntity<>(planet, HttpStatus.OK))
+				.orElse(ResponseEntity.notFound().build());
+	}
+
 
 	@PostMapping
 	@ApiOperation(value = "Add one Planet")
