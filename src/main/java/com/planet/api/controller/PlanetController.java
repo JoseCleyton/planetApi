@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planet.api.document.Planet;
-import com.planet.api.document.PlanetaApiSW;
+import com.planet.api.exceptions.PayloadNotConsistentException;
 import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.response.Response;
 import com.planet.api.service.PlanetService;
@@ -55,8 +55,10 @@ public class PlanetController {
 			List<String> errs = this.buildListErrs(bindingResult);
 			return new ResponseEntity<Response<Planet>>(new Response<Planet>(errs), HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<Response<Planet>>(new Response<Planet>(planetService.add(planet)),
-				HttpStatus.CREATED);
+
+		return this.planetService.add(planet)
+				.map(p -> new ResponseEntity<Response<Planet>>(new Response<Planet>(p), HttpStatus.CREATED))
+				.orElseThrow(PayloadNotConsistentException::new);
 	}
 
 	@PutMapping
@@ -70,9 +72,8 @@ public class PlanetController {
 		}
 
 		return this.planetService.update(planet)
-				.map(record -> new ResponseEntity<Response<Planet>>(
-						new Response<Planet>(this.planetService.update(planet).get()), HttpStatus.ACCEPTED))
-				.orElse(ResponseEntity.notFound().build());
+				.map(p -> new ResponseEntity<Response<Planet>>(new Response<Planet>(p), HttpStatus.ACCEPTED))
+				.orElseThrow(ResourcesNotFoundException::new);
 	}
 
 	private List<String> buildListErrs(BindingResult bindingResult) {

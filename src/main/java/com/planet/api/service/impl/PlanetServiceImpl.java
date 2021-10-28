@@ -13,19 +13,25 @@ import com.planet.api.document.Planet;
 import com.planet.api.document.ResultApiSW;
 import com.planet.api.repository.PlanetRepository;
 import com.planet.api.service.PlanetService;
+import com.planet.api.service.PlanetSwService;
 
 @Service
 public class PlanetServiceImpl implements PlanetService {
 
 	@Autowired
 	private PlanetRepository planetRepository;
+	@Autowired
+	private PlanetSwService planetSwService;
 
 	@Override
-	public Planet add(Planet planet) {
-		this.findPlanetByName(planet.getName()).getResults()
+	public Optional<Planet> add(Planet planet) {
+		if (!this.isIdNull(planet.getId())) {
+			return Optional.empty();
+		}
+		this.planetSwService.findPlanetByName(planet.getName()).getResults()
 				.forEach(planetSw -> planet.setNumberOfApparitions(planetSw.getFilms().size()));
 		;
-		return this.planetRepository.save(planet);
+		return Optional.of(this.planetRepository.save(planet));
 	}
 
 	@Override
@@ -50,11 +56,8 @@ public class PlanetServiceImpl implements PlanetService {
 
 	}
 
-	private ResultApiSW findPlanetByName(String name) {
-		String fooResourceUrl = "https://swapi.dev/api/planets/?search=" + name;
-		ResponseEntity<ResultApiSW> response = new RestTemplate().exchange(fooResourceUrl, HttpMethod.GET, null,
-				ResultApiSW.class);
-		return response.getBody();
+	private boolean isIdNull(String id) {
+		return id == null;
 	}
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.planet.api.exceptions.PayloadNotConsistentException;
+import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.exceptions.response.ExceptionResponse;
 
 @ControllerAdvice
@@ -25,10 +26,16 @@ public class PlanetControllerAdvice extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(PayloadNotConsistentException.class)
-	public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(Exception ex, WebRequest request) {
+	public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(PayloadNotConsistentException ex, WebRequest request) {
 		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
 				request.getDescription(false));
 		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
-
+	
+	@ExceptionHandler(ResourcesNotFoundException.class)
+	public final ResponseEntity<ExceptionResponse> handleNotFoundExceptions(ResourcesNotFoundException ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+				request.getDescription(false));
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND);
+	}
 }

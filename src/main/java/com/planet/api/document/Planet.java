@@ -1,7 +1,5 @@
 package com.planet.api.document;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -18,10 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
-public class Planet implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
+public class Planet {
 	@Id
 	private String id;
 	@NotNull(message = "Name cannot null")

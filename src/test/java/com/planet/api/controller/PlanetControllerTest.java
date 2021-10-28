@@ -10,8 +10,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.planet.api.document.Planet;
-import com.planet.api.exceptions.PayloadNotConsistentException;
-import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.service.PlanetService;
 
 import io.restassured.http.ContentType;;
@@ -73,27 +69,16 @@ public class PlanetControllerTest {
 	}
 
 	@Test
-	public void shouldReturnSuccess_WhenAddPlanet() throws JsonProcessingException {
-		Planet planetMock = new Planet("Terra", "Arenoso", "Árido", 10);
+	public void shouldReturnNotFound_WhenUpdatePlanetBy() throws JsonProcessingException {
+		Planet planetMock = new Planet("1", "Terra", "Arenoso", "Árido", 10);
 
-		when(this.planetService.add(planetMock)).thenReturn(planetMock);
+		when(this.planetService.findById("1")).thenReturn(Optional.empty());
+		when(this.planetService.update(planetMock)).thenReturn(Optional.empty());
 
 		given().body(objectMapper.writeValueAsString(planetMock)).contentType(ContentType.JSON).when()
-				.post("/api/planet").then().status(HttpStatus.CREATED);
+				.put("/api/planet").then().status(HttpStatus.NOT_FOUND);
 
 	}
-
-//	@Test
-//	public void shouldReturnSuccess_WhenUpdatePlanet() throws JsonProcessingException {
-//		Planet planetMock = new Planet("1", "Terra", "Arenoso", "Árido", 10);
-//
-//		when(this.planetService.findById("1")).thenReturn(Optional.of(planetMock));
-//
-//		when(this.planetService.update(planetMock)).thenReturn(Optional.of(planetMock));
-//
-//		given().body(objectMapper.writeValueAsString(planetMock)).contentType(ContentType.JSON).when()
-//				.put("/api/planet").then().status(HttpStatus.ACCEPTED);
-//	}
 
 	@Test
 	public void shouldReturnNotFound_WhenUpdatePlanetWithoutId() throws JsonProcessingException {
@@ -114,11 +99,11 @@ public class PlanetControllerTest {
 		when(this.planetService.findById("1")).thenReturn(Optional.of(planetMock));
 		given().accept(ContentType.JSON).when().delete("/api/planet/{id}", "1").then().status(HttpStatus.OK);
 	}
-	
+
 	@Test
 	public void shouldReturnNotFound_WhenDeletePlanetById() {
 		when(this.planetService.findById("1")).thenReturn(Optional.empty());
 		given().accept(ContentType.JSON).when().delete("/api/planet/{id}", "1").then().status(HttpStatus.NOT_FOUND);
 	}
-	
+
 }

@@ -41,8 +41,8 @@ public class PlanetServiceTest {
 		Planet planetMock = Mockito.mock(Planet.class);
 		Mockito.when(planetMock.getId()).thenReturn(null);
 		Mockito.when(this.planetRepository.save(ArgumentMatchers.eq(planetMock))).thenReturn(planetMock);
-		Planet planet = this.planetServiceImpl.add(planetMock);
-		assertEquals(planet.getName(), planetMock.getName());
+		Optional<Planet> planet = this.planetServiceImpl.add(planetMock);
+		assertEquals(planet.get().getName(), planetMock.getName());
 		verify(this.planetRepository, times(1)).save(planetMock);
 	}
 

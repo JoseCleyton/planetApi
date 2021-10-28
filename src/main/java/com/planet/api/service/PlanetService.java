@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.planet.api.document.Planet;
 
 public interface PlanetService {
-	Planet add(Planet planet);
+	Optional<Planet> add(Planet planet);
 
 	Optional<Planet> update(Planet planet);
 

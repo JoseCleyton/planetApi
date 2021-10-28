@@ -1,11 +1,8 @@
 package com.planet.api.exceptions.response;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class ExceptionResponse implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class ExceptionResponse{
 
 	private Date timestamp;
 	private String message;
