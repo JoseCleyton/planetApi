@@ -1,11 +1,12 @@
 package com.planet.api.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,11 +41,11 @@ public class PlanetServiceTest {
 		Planet planetMock = Mockito.mock(Planet.class);
 		Mockito.when(planetMock.getId()).thenReturn(null);
 		Mockito.when(this.planetRepository.save(ArgumentMatchers.eq(planetMock))).thenReturn(planetMock);
-		this.planetServiceImpl.add(planetMock);
+		Planet planet = this.planetServiceImpl.add(planetMock);
+		assertEquals(planet.getName(), planetMock.getName());
 		verify(this.planetRepository, times(1)).save(planetMock);
 	}
 
-	
 	@Test
 	@DisplayName("Should Update Planet")
 	public void shouldUpdatePlanet() {
@@ -52,7 +53,8 @@ public class PlanetServiceTest {
 		Mockito.when(planetMock.getId()).thenReturn("1");
 		Mockito.when(this.planetRepository.findById("1")).thenReturn(Optional.of(planetMock));
 		Mockito.when(this.planetRepository.save(ArgumentMatchers.eq(planetMock))).thenReturn(planetMock);
-		this.planetServiceImpl.update(planetMock);
+		Optional<Planet> planet = this.planetServiceImpl.update(planetMock);
+		assertTrue(planet.isPresent());
 		verify(this.planetRepository, Mockito.times(1)).save(ArgumentMatchers.any(Planet.class));
 	}
 
@@ -63,7 +65,8 @@ public class PlanetServiceTest {
 		Mockito.when(planetMock.getId()).thenReturn(null);
 		Mockito.when(this.planetRepository.findById("1")).thenReturn(Optional.empty());
 		Mockito.when(this.planetRepository.save(ArgumentMatchers.eq(planetMock))).thenReturn(planetMock);
-		this.planetServiceImpl.update(planetMock);
+		Optional<Planet> planet = this.planetServiceImpl.update(planetMock);
+		assertTrue(planet.isEmpty());
 	}
 
 	@Test
@@ -76,20 +79,20 @@ public class PlanetServiceTest {
 		planets.add(planetMock1);
 		planets.add(planetMock2);
 		planets.add(planetMock3);
-		
 		Mockito.when(this.planetRepository.findAll()).thenReturn(planets);
-
-		this.planetServiceImpl.findAll();
+		List<Planet> response = this.planetServiceImpl.findAll();
+		assertFalse(response.isEmpty());
 		verify(this.planetRepository, times(1)).findAll();
 	}
-	
+
 	@Test
 	@DisplayName("Should Find Planet By Id")
 	public void shouldFindPlanetById() {
 		Planet planetMock = Mockito.mock(Planet.class);
 		Mockito.when(planetMock.getId()).thenReturn("1");
 		Mockito.when(this.planetRepository.findById("1")).thenReturn(Optional.of(planetMock));
-		this.planetServiceImpl.findById("1");
+		Optional<Planet> planet = this.planetServiceImpl.findById("1");
+		assertTrue(planet.isPresent());
 		verify(this.planetRepository, Mockito.times(1)).findById("1");
 	}
 

@@ -4,9 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.planet.api.document.Planet;
+import com.planet.api.document.ResultApiSW;
 import com.planet.api.repository.PlanetRepository;
 import com.planet.api.service.PlanetService;
 
@@ -18,6 +22,9 @@ public class PlanetServiceImpl implements PlanetService {
 
 	@Override
 	public Planet add(Planet planet) {
+		this.findPlanetByName(planet.getName()).getResults()
+				.forEach(planetSw -> planet.setNumberOfApparitions(planetSw.getFilms().size()));
+		;
 		return this.planetRepository.save(planet);
 	}
 
@@ -41,6 +48,13 @@ public class PlanetServiceImpl implements PlanetService {
 	public void delete(String id) {
 		this.planetRepository.deleteById(id);
 
+	}
+
+	private ResultApiSW findPlanetByName(String name) {
+		String fooResourceUrl = "https://swapi.dev/api/planets/?search=" + name;
+		ResponseEntity<ResultApiSW> response = new RestTemplate().exchange(fooResourceUrl, HttpMethod.GET, null,
+				ResultApiSW.class);
+		return response.getBody();
 	}
 
 }

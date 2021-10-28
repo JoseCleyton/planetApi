@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.planet.api.document.Planet;
+import com.planet.api.document.PlanetaApiSW;
 import com.planet.api.exceptions.ResourcesNotFoundException;
 import com.planet.api.response.Response;
 import com.planet.api.service.PlanetService;
